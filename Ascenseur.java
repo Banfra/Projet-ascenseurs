@@ -1,13 +1,11 @@
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Ascenseur implements Runnable{
     private int id = 0;
     private int vitesseAscenseur = 10; //Secondes que met l'ascenseur pour 1 étage
-    private int capacite = 9999;
     private Ordonnancement ordonnancement = Ordonnancement.FCFS;
     private boolean doorsOpen = false;
+    private Idle idle = Idle.STAY;
 
     private int etage_actuel;
     private CopyOnWriteArrayList<Integer> etages_suivant = new CopyOnWriteArrayList<Integer>();
@@ -70,27 +68,73 @@ public class Ascenseur implements Runnable{
         listPersonnes.remove(personne);
     }
 
+    public Idle getIdle(){
+        return idle;
+    }
+
     public void move(int etage) throws InterruptedException{
         doorsOpen = false;
         while(etage != etage_actuel){
-            Thread.sleep(vitesseAscenseur*1000);
+            if(ordonnancement == Ordonnancement.SSTF){
+                int newEtage = getEtageSuivant(ordonnancement);
+                if(newEtage != etage){
+                    move(newEtage);
+                }
+            }
+            int acceleration = Immeuble.getInstance().getAcceleration();
+            Thread.sleep(vitesseAscenseur*1000/acceleration);
             if(etage > etage_actuel){
                 etage_actuel++;
             }
             else if(etage < etage_actuel){
                 etage_actuel--;
             }
-            System.out.println("Etage actuel ascenseur : "+ etage_actuel);
+            // System.out.println("Etage actuel ascenseur : "+ etage_actuel);
+
+            for (Integer thisetage : etages_suivant) {
+                if(thisetage == etage_actuel){
+                    // System.out.println("Remove etage "+ thisetage);
+                    etages_suivant.remove(thisetage);
+                }
+            }
             
         }
-        doorsOpen = true;
+
         for (Integer thisetage : etages_suivant) {
             if(thisetage == etage){
-                System.out.println("Remove etage "+ thisetage);
+                // System.out.println("Remove etage "+ thisetage);
                 etages_suivant.remove(thisetage);
             }
         }
+
+        doorsOpen = true;
+
         
+        
+    }
+
+    public void idle() throws InterruptedException{
+        switch(idle){
+            case STAY:
+                break;
+
+            case INF:
+                if(etage_actuel > 0){
+                    move(etage_actuel-1);
+                }
+                break;
+
+            case SUP:
+                if(etage_actuel < Immeuble.getInstance().getNbEtages()-1){
+                    move(etage_actuel+1);
+                }
+                break;
+
+            case MIDDLE:
+                move((int)Immeuble.getInstance().getNbEtages()/2);
+                break;
+            default:
+        }
     }
 
     public void run(){
@@ -98,8 +142,11 @@ public class Ascenseur implements Runnable{
             System.out.println("Ascenseur run()");
             while(true){
                 if(etages_suivant.size() != 0){
-                    System.out.println("Move");
+                    // System.out.println("Move");
                     move(getEtageSuivant(ordonnancement));
+                    if(etages_suivant.size() == 0){
+                        idle();
+                    }
                 }
             }
         } catch (InterruptedException e) {

@@ -3,7 +3,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DisplayConsole extends Thread{
     private ArrayList<Ascenseur> lAscenseurs;
-    private CopyOnWriteArrayList<Personne> lPersonnes;
     private ArrayList<ArrayList<String>> arrayToDisplay = new ArrayList<ArrayList<String>>();
     private ArrayList<ArrayList<String>> oldarray = new ArrayList<ArrayList<String>>();
     DisplayConsole(){}
@@ -12,55 +11,42 @@ public class DisplayConsole extends Thread{
         Immeuble immeuble = Immeuble.getInstance();
         lAscenseurs = immeuble.getAscenseurs();
         
-        for(int i = 2; i<immeuble.getNbEtages()*2+2; i++){
+        for(int i = 2; i<immeuble.getNbEtages()*2+1; i++){
             ArrayList<String> arr = new ArrayList<String>();
             if(i%2 == 0){
-                arr.add(String.valueOf(i/2));
+                arr.add(String.valueOf(i/2-1));
                 while(arr.size() != immeuble.getAscenseurs().size()*2+1){
-                    arr.add(String.valueOf(' '));
+                    if(arr.size() == 1){
+                        arr.add(String.valueOf(0));
+                    }
+                    else{
+                        arr.add(String.valueOf(' '));
+                    }
                 }
-                // for(int j = 0; j<immeuble.getAscenseurs().size(); j++){
-                //     char[] str = {' ',' ',' '};
-                //     for (char c : str) {
-                //         arr.add(String.valueOf(c));
-                //     }
-                // }
             }
             else{
                 while(arr.size() != immeuble.getAscenseurs().size()*2+1){
                     arr.add(String.valueOf(' '));
                 }
-                // for(int j = 0; j<immeuble.getAscenseurs().size(); j++){
-                //     char[] str = {' ',' ',' ', ' '};
-                //     for (char c : str) {
-                //         arr.add(String.valueOf(c));
-                //     }
-                // }
             }
             arrayToDisplay.add(arr);
-        }
-        // for (ArrayList<String> arrayList : arrayToDisplay) {
-        //     System.out.println(arrayList);
-        // }
-
-        // for(int i = arrayToDisplay.size()-1; i>=0; i--){
-        //     System.out.println(arrayToDisplay.get(i));
-        // }        
-        
-        
+        } 
     }
 
     public void display(){
         Immeuble immeuble = Immeuble.getInstance();
-        lAscenseurs = immeuble.getAscenseurs();
-        lPersonnes = immeuble.getListPersonnes();
-        
+        lAscenseurs = immeuble.getAscenseurs();        
 
         for (Ascenseur ascenseur : lAscenseurs) {
             int etage = ascenseur.getEtageActuel();
             int id = ascenseur.getId();
             int nbPersonnes = ascenseur.getListPersonnes().size();
+            CopyOnWriteArrayList<Personne> lPersonnes = Immeuble.getInstance().getListPersonnes();
+
             arrayToDisplay.get(etage*2).set(id*2, String.valueOf(nbPersonnes));
+            for (Personne personne : lPersonnes) {
+                arrayToDisplay.get(personne.getEtageActuel()*2).set(1, String.valueOf(Integer.parseInt(arrayToDisplay.get(personne.getEtageActuel()*2).get(1))+1));
+            }
 
         }
         
@@ -68,17 +54,26 @@ public class DisplayConsole extends Thread{
             for(int i = arrayToDisplay.size()-1; i>=0; i--){
                 System.out.println(arrayToDisplay.get(i));
             }
+            System.out.println("Mesure de performance : " + Immeuble.getInstance().calculPerformance());
+            System.out.println(" ");
         }
         oldarray.clear();
-        for (ArrayList<String> arraylist : arrayToDisplay) {
-            oldarray.add(arraylist);
+        oldarray = new ArrayList<ArrayList<String>>(arrayToDisplay);
+        for(int i =0; i<oldarray.size(); i++){
+            oldarray.set(i, new ArrayList<String>(arrayToDisplay.get(i)));
         }
 
         for (Ascenseur ascenseur : lAscenseurs) {
             int etage = ascenseur.getEtageActuel();
             int id = ascenseur.getId();
             int nbPersonnes = ascenseur.getListPersonnes().size();
+            CopyOnWriteArrayList<Personne> lPersonnes = Immeuble.getInstance().getListPersonnes();
+
             arrayToDisplay.get(etage*2).set(id*2, String.valueOf(' '));
+
+            for (Personne personne : lPersonnes) {
+                arrayToDisplay.get(personne.getEtageActuel()*2).set(1, String.valueOf(0));
+            }
 
         }
     }
@@ -87,7 +82,8 @@ public class DisplayConsole extends Thread{
         while(true){
             display();
             try {
-                sleep(1000);
+                int acceleration = Immeuble.getInstance().getAcceleration();
+                sleep(1000/acceleration);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

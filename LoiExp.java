@@ -1,7 +1,5 @@
+import java.awt.Graphics;
 import java.util.Random;
-import java.awt.*;
-
-import javax.swing.JPanel;
 
 
 public class LoiExp{
@@ -25,7 +23,6 @@ public class LoiExp{
     public static double rndloiExp(double lambda) {
         Random rand = new Random();
         double nb = Math.log(1-rand.nextDouble())/(-lambda);
-        System.out.println(nb);
         return nb;
     }
 

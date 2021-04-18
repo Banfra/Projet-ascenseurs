@@ -1,20 +1,12 @@
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.swing.JPanel;
-
-import java.awt.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
-public class Immeuble extends JPanel implements Runnable{
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private int nbAscenseurs = 2;
+public class Immeuble implements Runnable{
+    private int nbAscenseurs = 1;
     private int nbEtages = 7;
+    private int acceleration = 50;
     private ArrayList<Ascenseur> lAscenseurs = new ArrayList<Ascenseur>();
     private CopyOnWriteArrayList<Personne> lPersonnes = new CopyOnWriteArrayList<Personne>();
+    private CopyOnWriteArrayList<Long> lPerformances = new CopyOnWriteArrayList<Long>();
     private static Immeuble INSTANCE = null;
 
 
@@ -29,12 +21,40 @@ public class Immeuble extends JPanel implements Runnable{
         return lAscenseurs;
     }
 
+    public int getAcceleration(){
+        return acceleration;
+    }
+
+
     public CopyOnWriteArrayList<Personne> getListPersonnes(){
         return lPersonnes;
     }
 
     public void removePersonne(Personne personne){
         lPersonnes.remove(personne);
+    }
+
+    
+    public CopyOnWriteArrayList<Long> getListPerformances(){
+        return lPerformances;
+    }
+
+    public void addPerformance(Long performance){
+        lPerformances.add(performance);
+    }
+
+    public long calculPerformance(){
+        long somme = 0;
+        for (Long performance : lPerformances) {
+            somme += performance;
+        }
+
+        if(lPerformances.size() != 0){
+            return somme/lPerformances.size();
+        }
+        else{
+            return 0;
+        }
     }
 
     public static Immeuble getInstance() {
@@ -51,30 +71,6 @@ public class Immeuble extends JPanel implements Runnable{
     }
 
     @Override
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-        
-        int height = Display.getInstance().getHeight();
-        int width = Display.getInstance().getWidth();
-
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(Color.BLACK);
-        g2.drawLine(50, 0, 50, height-50);
-        g2.drawLine(width-50, 0, width-50, height-50);
-        for(int i=0; i<nbEtages+1;i++){
-            g2.drawLine(50, height-i*(height-50)/nbEtages -50, width-50, height-i*(height-50)/nbEtages -50);
-            g2.drawString(String.valueOf(i), 25, height-i*(height-50)/nbEtages);
-        }
-        setOpaque(true);
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void run() {
         while(true){
             // TODO Auto-generated method stub
@@ -88,7 +84,7 @@ public class Immeuble extends JPanel implements Runnable{
                 
             }
             try {
-                Thread.sleep(10000);
+                Thread.sleep(60000/acceleration);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

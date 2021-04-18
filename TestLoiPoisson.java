@@ -1,11 +1,9 @@
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import java.awt.*;
 
 public class TestLoiPoisson extends JPanel{
     private static ArrayList<ArrayList<Integer>> testldp = new ArrayList<ArrayList<Integer>>();
