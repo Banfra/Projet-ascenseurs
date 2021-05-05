@@ -7,7 +7,7 @@ public class Ascenseur implements Runnable{
     private Ordonnancement ordonnancement = Ordonnancement.SSTF; //Voir Ordonnancement.java pour plus de détails
     private boolean doorsOpen = true; //variable représentant l'ouverture des portes (true pour ouvertes, false pour fermées)
     private boolean moving = false; //variable permettant d'informer si l'ascenseur est en mouvement
-    private Idle idle = Idle.INF; //Voir Idle.java pour plus de détails
+    private Idle idle = Idle.STAY; //Voir Idle.java pour plus de détails
 
     private int etage_actuel; //etage actuel
     private CopyOnWriteArrayList<Integer> etages_suivant = new CopyOnWriteArrayList<Integer>(); //Liste des prochains étages où l'ascenseur doit se rendre
@@ -178,9 +178,9 @@ public class Ascenseur implements Runnable{
             while(true){
                 if(etages_suivant.size() != 0){ //si la liste des étages suivants n'est pas vide
                     move(getEtageSuivant(ordonnancement));//on se déplace à l'étage suivant en fonction de l'ordonnancement de l'ascenseur
-                    if(etages_suivant.size() == 0){ //si la liste redevient vide ensuite,
-                        idle();//l'ascenseur est au ralenti
-                    }
+                }
+                else if(etages_suivant.size() == 0){ //si la liste redevient vide ensuite,
+                    idle();//l'ascenseur est au ralenti
                 }
             }
         } catch (InterruptedException e) { //gestion des exceptions

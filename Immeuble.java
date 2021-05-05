@@ -4,7 +4,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Immeuble implements Runnable{
     private int nbAscenseurs = 3; //nombre d'ascenseurs
     private int nbEtages = 7; //nombre d'étages dans l'immeuble
-    private int acceleration = 50; //coefficient d'acceleration afin d'augmenter la vitesse de simulation
+    private int acceleration = 20; //coefficient d'acceleration afin d'augmenter la vitesse de simulation
     private ArrayList<Ascenseur> lAscenseurs = new ArrayList<Ascenseur>(); //liste des ascenseurs
     private CopyOnWriteArrayList<Personne> lPersonnes = new CopyOnWriteArrayList<Personne>(); //liste des personnes
     private CopyOnWriteArrayList<Long> lPerformances = new CopyOnWriteArrayList<Long>(); //liste des performances pour la mesure de performance

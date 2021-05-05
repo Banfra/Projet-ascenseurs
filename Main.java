@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class Main {
     //fonction main du programme
     public static void main(String[] args) throws InterruptedException {
+        int temps = 10; //temps de simulation
         Immeuble immeuble = new Immeuble(); //on crée un immeuble
         ArrayList<Ascenseur> ascenseurs = immeuble.getAscenseurs(); //on récupère les ascenseurs
         //pour chaque ascenseur, on crée un thread, on le lance et on le renomme
@@ -26,10 +27,12 @@ public class Main {
         displayConsole.start();
         displayConsole.setName("DisplayConsole");
         
-        //on lance la simulation pendant 10 minutes
-        LocalTime time = LocalTime.now();
-        while(Duration.between(time, LocalTime.now()).toMinutes() != 10){ } //durée d'éxécution en minutes
-        System.out.println("\n\n----- Fin du programme -----\n\n");
-        System.exit(0);
+        if(temps != 0){
+            //on lance la simulation pendant 10 minutes
+            LocalTime time = LocalTime.now();
+            while(Duration.between(time, LocalTime.now()).toMinutes() != temps){ } //durée d'éxécution en minutes
+            System.out.println("\n\n----- Fin du programme -----\n\n");
+            System.exit(0);
+        }
     }
 }
